@@ -1,6 +1,12 @@
+import os
+import sys
 # from glob import glob
 from pathlib import Path
 import json
+from src import memory_based, sort_based
+import pprint
+import pickle
+from timeit import timeit
 
 BOOKS_ROOT = '/Volumes/storeA/books'
 
@@ -8,7 +14,10 @@ BOOKS_ROOT = '/Volumes/storeA/books'
 def main():
     # generate_docs()
     docs = read_docs()
-    construct_index_1(docs)
+    # construct_index_1(docs)
+
+    # _ = construct_index_2(docs)
+    find_index_2()
 
 
 def read_docs():
@@ -29,7 +38,35 @@ def generate_docs():
 
 
 def construct_index_1(docs):
-    pass
+    def bar():
+        index = {}
+        for d in docs:
+            index = memory_based.consume_doc(d.id, d.name, index)
+    # pprint.pprint(index)
+    # print(f'= index pickled size: {sys.getsizeof(pickle.dumps(index))} bytes')
+
+    t = timeit(lambda: bar(), number=100)
+    print('- timing:', t)
+
+
+def construct_index_2(docs):
+    def bar():
+        _ = sort_based.consume_docs(docs)
+
+    # t = timeit(lambda: bar(), number=100)
+    # print('- timing:', t)
+    bar()
+    # sort_based.dump_tmp_file()
+    # sort_based.ensure_tmp_file_is_sorted()
+
+
+def find_index_2():
+    terms = 'swift'
+    doc_ids = sort_based.find_docs(terms)
+    # print(doc_ids)
+    docs = read_docs()
+    docs = list(filter(lambda d: d.id in doc_ids, docs))
+    print(docs)
 
 
 class Document:
@@ -75,4 +112,5 @@ class Document:
 
 
 if __name__ == '__main__':
+    sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
     main()

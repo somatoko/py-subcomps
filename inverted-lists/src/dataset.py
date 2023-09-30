@@ -1,5 +1,6 @@
 import os
 import abc
+import json
 from pathlib import Path
 
 DATA_BASE_DIR = '_tmp'
@@ -25,7 +26,7 @@ class Dataset:
             self.inverted_file_path,
             self.temp_file_path)
 
-        docs_gen = self.delegate.docs_gen(self.docs_file_path)
+        docs_gen = self.delegate.docs_gen(self.entry_gen)
         method.create_invreted_file(docs_gen)
 
     def search(self, query):
@@ -34,10 +35,14 @@ class Dataset:
             self.inverted_file_path,
             self.temp_file_path)
 
-        docs_gen = self.delegate.docs_gen(self.docs_file_path)
-        doc_ids = method.retrieve_docs(query)
-        docs = [d for d in docs_gen if d.id in doc_ids]
-        print(docs)
+        return method.retrieve_docs(query)
+
+    @property
+    def entry_gen(self):
+        with open(self.docs_file_path, 'r') as fin:
+            entries = json.load(fin)
+        for u in entries:
+            yield u
 
     @property
     def base_subdir(self):

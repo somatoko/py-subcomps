@@ -1,0 +1,25 @@
+{% extends "base_layout.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+{% include 'home/_form.html' %}
+
+{% if entries %}
+<div class="my-3">
+  {% for entry in entries %}
+  <div class="my-3">
+    <div class="text-nowrap text-primary fs-5 fw-light">{{entry['name']}}</div>
+    <div class="text-secondary fw-medium" style="font-size:11px;">
+      <span class="pe-3">{{entry['created']|format_datetime}}</span>
+      <span class="">{{entry['size']|filesizeformat}}</span>
+    </div>
+    <div class="text-secondary fw-light" style="font-size:12px;">{{entry['path']}}</div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <p>No results found</p>
+</div>
+{% endif %}
+
+{% endblock %}

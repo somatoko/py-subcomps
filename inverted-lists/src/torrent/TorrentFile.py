@@ -31,8 +31,12 @@ class TorrentFile:
         return os.path.getctime(self.path)
 
     @property
+    def total_size(self):
+        return self.count_total_length()
+
+    @property
     def total_size_formatted(self):
-        return humanbytes(self.count_total_length())
+        return humanbytes(self.total_size)
 
     def quick_info(self):
         keys = self.meta.keys()

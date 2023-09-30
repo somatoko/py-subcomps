@@ -32,9 +32,11 @@ class SortBasedIndex:
 
         # -2- write frequencies to tmp file
 
+        doc_count = 0
         entry_count = 0
         for doc in docs:
-            stats = self.__extract_doc_terms(doc.name)
+            doc_count += 1
+            stats = self.__extract_doc_terms(doc.content)
             for (term, freq) in stats.items():
                 _term_id = get_term_id(term)
                 entry = self.__freq_entry_pack(_term_id, doc.id, freq)
@@ -80,27 +82,30 @@ class SortBasedIndex:
         with open(self.lexicon_path, 'wb') as fout:
             pickle.dump(lexicon, fout)
 
-        print(f'= Ready with {len(docs)} docs and {len(lexicon.keys())} terms')
+        print(f'= Ready with {doc_count} docs and {len(lexicon.keys())} terms')
 
         return lexicon
 
     def retrieve_docs(self, terms):
+        terms = terms.lower()
         with open(self.lexicon_path, 'rb') as fin:
             lexicon = pickle.load(fin)
         entry = lexicon.get(terms, None)
-        if entry is not None:
-            (freq, pos) = entry
-            with open(self.inverted_file_path, 'rb') as fin:
-                entry_size = struct.calcsize(ENTRY_FORMAT_INF)
-                size = entry_size * freq
-                fin.seek(pos)
-                list_raw = fin.read(size)
-                list_ids = [struct.unpack(ENTRY_FORMAT_INF, list_raw[u: u + entry_size])
-                            for u in range(0, size, entry_size)]
-                # TODO: sort docs somehow
+        if entry is None:
+            return []
 
-                # Return doc ids
-                return list(map(lambda u: u[0], list_ids))
+        (freq, pos) = entry
+        with open(self.inverted_file_path, 'rb') as fin:
+            entry_size = struct.calcsize(ENTRY_FORMAT_INF)
+            size = entry_size * freq
+            fin.seek(pos)
+            list_raw = fin.read(size)
+            list_ids = [struct.unpack(ENTRY_FORMAT_INF, list_raw[u: u + entry_size])
+                        for u in range(0, size, entry_size)]
+            # TODO: sort docs somehow
+
+            # Return doc ids
+            return list(map(lambda u: u[0], list_ids))
 
     def __extract_doc_terms(self, content):
         ''' Construct a dictonary mappind text terms to their frequency.
@@ -108,7 +113,7 @@ class SortBasedIndex:
         '''
         stats = {}
         for word in content.split():
-            word.lower()
+            word = word.lower()
             if word in stats:
                 stats[word] += 1
             else:

@@ -15,8 +15,29 @@ class Dataset:
         # ensure data dir exists
         Path(self.base_subdir).mkdir(parents=True, exist_ok=True)
 
-    def create_inverted_file(self, docs):
-        pass
+    def collect_documents(self):
+        self.delegate.collect_documents(self.docs_file_path)
+
+    def create_inverted_file(self):
+
+        method = self.delegate.strategy(
+            self.lexicon_file_path,
+            self.inverted_file_path,
+            self.temp_file_path)
+
+        docs_gen = self.delegate.docs_gen(self.docs_file_path)
+        method.create_invreted_file(docs_gen)
+
+    def search(self, query):
+        method = self.delegate.strategy(
+            self.lexicon_file_path,
+            self.inverted_file_path,
+            self.temp_file_path)
+
+        docs_gen = self.delegate.docs_gen(self.docs_file_path)
+        doc_ids = method.retrieve_docs(query)
+        docs = [d for d in docs_gen if d.id in doc_ids]
+        print(docs)
 
     @property
     def base_subdir(self):
@@ -24,6 +45,10 @@ class Dataset:
             return f'{DATA_BASE_DIR}/{self.subdir}'
         else:
             return DATA_BASE_DIR
+
+    @property
+    def docs_file_path(self):
+        return f'{self.base_subdir}/{self.name}.json'
 
     @property
     def inverted_file_path(self):

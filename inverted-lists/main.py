@@ -61,7 +61,7 @@ def construct_index_2(docs):
     # sort_based.dump_tmp_file()
     # sort_based.ensure_tmp_file_is_sorted()
 
-    ds = dataset.Dataset('torrents', None, 'torrent_set')
+    ds = dataset.Dataset('books', None, 'storea_book_set')
     method = sort_based.SortBasedIndex(
         ds.lexicon_file_path, ds.inverted_file_path, ds.temp_file_path)
     method.create_invreted_file(docs)

@@ -37,6 +37,14 @@ class Dataset:
 
         return method.retrieve_docs(query)
 
+    def find_by_id(self, id):
+        with open(self.docs_file_path, 'r') as fin:
+            entries = json.load(fin)
+            for u in entries:
+                if u['id'] == id:
+                    return u
+        return None
+
     @property
     def entry_gen(self):
         with open(self.docs_file_path, 'r') as fin:

@@ -9,7 +9,9 @@
 <div class="my-3">
   {% for entry in entries %}
   <div class="my-3">
-    <div class="text-nowrap text-primary fs-5 fw-light">{{entry['name']}}</div>
+    {% set entry_id = "%s:%d" % (entry.src, entry.id) %}
+    <a href="{{ url_for('home.details', id=entry.src ) }}"
+      class="link-offset-2 link-underline link-underline-opacity-0 link-underline-opacity-75-hover text-nowrap text-primary fs-5 fw-light">{{entry['name']}}</a>
     <div class="text-secondary fw-medium" style="font-size:11px;">
       <span class="pe-3">{{entry['created']|format_datetime}}</span>
       <span class="">{{entry['size']|filesizeformat}}</span>

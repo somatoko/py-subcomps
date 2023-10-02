@@ -1,0 +1,16 @@
+{% extends "base_layout.html" %}
+{% block title %}Details{% endblock %}
+
+{% block content %}
+
+<h3>Details</h3>
+<ul>
+  <li>Id: {{entry.id}}</li>
+  <li>Name: {{entry.name}}</li>
+  <li>Path: {{entry.path}}</li>
+  <li>Comment: {{entry.comment}}</li>
+  <li>Size: {{entry.size | filesizeformat}}</li>
+  <li>Created: {{entry.created | format_datetime}}</li>
+</ul>
+
+{% endblock %}

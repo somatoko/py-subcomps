@@ -1,5 +1,7 @@
+import base64
 from flask import Blueprint, render_template, redirect, request, url_for
 
+from src.dataset import Dataset
 from tailor import TorrentsTailor, BooksTailor, CoursesTailor
 from itertools import chain
 
@@ -19,7 +21,7 @@ def home_page():
         torrent_gen = torrents.search(q)
         books = BooksTailor()
         books_gen = books.search(q)
-        courses = BooksTailor()
+        courses = CoursesTailor()
         courses_gen = courses.search(q)
 
         entries = chain(
@@ -29,6 +31,18 @@ def home_page():
         )
 
         return render_template('home/index_results.html', q=q, entries=entries)
+
+
+@home.route('/entry/<src>', methods=['GET'])
+def details(src):
+    src_decoded = base64.urlsafe_b64decode(bytes(src, 'utf-8')).decode()
+    data_src, id = src_decoded.split(':')
+    subdir, name = data_src.split('/')
+
+    ds = Dataset(name, None, subdir)
+    entry = ds.find_by_id(int(id))
+
+    return render_template('home/details.html', entry=entry)
 
 
 @home.route('/about')

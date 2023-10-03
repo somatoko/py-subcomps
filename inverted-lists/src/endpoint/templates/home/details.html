@@ -4,13 +4,36 @@
 {% block content %}
 
 <h3>Details</h3>
-<ul>
-  <li>Id: {{entry.id}}</li>
-  <li>Name: {{entry.name}}</li>
-  <li>Path: {{entry.path}}</li>
-  <li>Comment: {{entry.comment}}</li>
-  <li>Size: {{entry.size | filesizeformat}}</li>
-  <li>Created: {{entry.created | format_datetime}}</li>
+<ul class="mb-5 w-50 list-group">
+  <li class="list-group-item">Id: {{entry.src}}</li>
+  <li class="list-group-item">Name: {{entry.name}}</li>
+  <li class="list-group-item">Path: {{entry.path}}</li>
+  <li class="list-group-item">Comment: {{entry.comment}}</li>
+  <li class="list-group-item">Size: {{entry.size | filesizeformat}}</li>
+  <li class="list-group-item">Created: {{entry.created | format_datetime }}</li>
+  <li class="list-group-item">Upserted: {{db_doc.created_at | format_datetime }}</li>
 </ul>
+
+<form action="" method="post" class="w-50">
+  <div class="mb-3">
+    <label for="nameField" class="form-label">Name</label>
+    <input type="text" class="form-control" id="nameField" aria-describedby="nameFieldHelp"
+      value="{{db_doc.name or ''}}">
+    <div id="nameFieldHelp" class="form-text">Managed separately from the original name.</div>
+  </div>
+  <div class="mb-1">
+    <label for="notesInput" class="form-label">Notes</label>
+    <textarea name="notes" id="notesInput" class="form-control" cols="30" rows="3">{{db_doc.notes or ''}}</textarea>
+  </div>
+  <div class="mb-4 form-check">
+    <input class="form-check-input" type="checkbox" name="is_favourite" id="favouriteCheck" {{'checked' if
+      db_doc.is_favourite else '' }}>
+    <label class="form-check-label" for="favouriteCheck">
+      Favourite
+    </label>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
 
 {% endblock %}

@@ -1,7 +1,9 @@
 from flask import Flask, render_template
 from random import randint
 import time
+import datetime
 
+from src.endpoint.extensions import db
 from src.endpoint.blueprints.home import home
 
 # To launch from shell: FLASK_APP=src.endpoint FLASK_DEBUG=on flask run
@@ -13,12 +15,25 @@ def create_app(environment_name='dev'):
     # custom config
     # app.config.from_object(configs[environment_name])
 
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite+pysqlite:///data.sqlite3"
+    db.init_app(app)
+
+    with app.app_context():
+        db.create_all()
+
     @app.errorhandler(500)
     def handle_error(exception):
         return render_template('500.html')  # pragma: no cover
 
     @app.template_filter()
     def format_datetime(value, format='medium'):
+        if isinstance(value, datetime.datetime):
+            return value.strftime("%d %b %Y at %H:%M")
+        elif isinstance(value, int):
+            return time.strftime("%d %b %Y at %H:%M", time.gmtime(value))
+
+        # old formatter
+        '''
         if format == 'full':
             format = "EEEE, d. MMMM y 'at' HH:mm"
         elif format == 'medium':
@@ -27,6 +42,7 @@ def create_app(environment_name='dev'):
         # return time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime(value))
         return time.strftime("%d %b %Y at %H:%M", time.gmtime(value))
         # return time.ctime(value)
+        '''
 
     app.register_blueprint(home, url_prefix='/')
     return app

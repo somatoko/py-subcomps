@@ -20,6 +20,14 @@
               aria-current="page" href="/">Home</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link {% if request.url_rule.endpoint == 'home.recents'%}active{% endif %}"
+              href="/recents">Recents</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.url_rule.endpoint == 'home.favourites'%}active{% endif %}"
+              href="/favourites">Favourites</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link {% if request.url_rule.endpoint == 'home.about'%}active{% endif %}"
               href="/about">About</a>
           </li>

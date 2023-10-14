@@ -14,6 +14,7 @@ class Block:
         self.next_id = 0
         self.prev_id = 0
         self.is_deleted = False
+        self.is_leaf = False
 
     def get_header(self):
         self._set_cursor(src_offset)
@@ -27,16 +28,17 @@ class Block:
         self._set_cursor()
         fmt = '>IHH??'
         buf = self._fd.read(self.header_size)
-        a, b, c, d, _ = struct.unpack(fmt, buf)
+        a, b, c, d, e = struct.unpack(fmt, buf)
         self.record_length = a
         self.next_id = b
         self.prev_id = c
         self.is_deleted = d
+        self.is_leaf = e
 
     def flush_header(self):
         self._set_cursor()
         fmt = '>IHH??'
-        bytes = struct.pack(fmt, self.record_length, self.next_id, self.prev_id, self.is_deleted, True)
+        bytes = struct.pack(fmt, self.record_length, self.next_id, self.prev_id, self.is_deleted, self.is_leaf)
         self._fd.write(bytes)
 
     def set_header(self, value):
@@ -56,3 +58,6 @@ class Block:
         '''
         final_offset = self.block_size * self.id + extra
         self._fd.seek(final_offset, os.SEEK_SET)
+        # try:
+        # except:
+        #     import pdb; pdb.set_trace()

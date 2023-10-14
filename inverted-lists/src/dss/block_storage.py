@@ -50,6 +50,7 @@ class BlockStorage:
     # ----------------- Internal API
 
     def cleanup(self):
+        print(f'- block storage with: {self.block_count} blocks')
         if self.file is not None:
             print(f'- file close for {self.filename}')
             self.file.close()

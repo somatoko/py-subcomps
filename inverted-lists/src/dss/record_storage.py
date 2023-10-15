@@ -13,7 +13,6 @@ class RecordStorage:
 
     def insert(self, entity):
         bytes = entity.serialize()
-        print(f'- inserting: {entity.id}:{entity.title}')
 
         first_block = self._allocate_fresh_block()
         first_block.record_length = len(bytes)
@@ -43,9 +42,7 @@ class RecordStorage:
             block.flush_header()
 
             data_written += write_count
-            print(f' wrote: {data_written}/{total_bytes}')
             prev_block = block
-        print('= done')
 
         return first_block.id
 

@@ -34,6 +34,9 @@ class BTree:
     def delete(self, key):
         return self.tree_delete(self.root, key)
 
+    def iterate(self, key=0):
+        return self.tree_iterate_elements()
+
     # ----------------- Internal API
 
     @property
@@ -42,6 +45,25 @@ class BTree:
         if possible % 2 == 0:
             return possible - 1
         return possible
+    
+    def tree_iterate_elements(self):
+        nodes_stack = []
+
+        nodes_stack.append((self.root.id, 0))
+        while len(nodes_stack) > 0:
+            node_id, i = nodes_stack.pop()
+            block = self._block_storage.find_block(node_id)
+            node = BTreeNode(block)
+            if node.is_leaf:
+                for i in range(node.length):
+                    yield (node.keys[i], node.vals[i])
+            elif i <= node.length:
+                if i > 0:
+                    yield (node.keys[i-1], node.vals[i-1])
+                nodes_stack.append((node.id, i+1))
+                nodes_stack.append((node.refs[i], 0))
+
+        
 
     def tree_delete(self, node, key):
         if node.is_leaf:
@@ -237,7 +259,8 @@ class BTree:
             i += 1
 
         if i < node.length and node.keys[i] == key:
-            return (f'- node({node.id}) - {node.vals[i]}')
+            # return (f'- node({node.id}) - {node.vals[i]}')
+            return node.vals[i]
         elif node.is_leaf:
             return None
         else:

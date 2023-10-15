@@ -1,0 +1,19 @@
+{% extends "base_layout.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<h1>Recent forum entries</h1>
+<p>Simple way to find what you need.</p>
+
+{% for topic in topics %}
+<div class="my-3">
+  <a href="{{ url_for('forum.details', id=topic.id ) }}"
+    class="link-offset-2 link-underline link-underline-opacity-0 link-underline-opacity-75-hover text-nowrap text-primary fs-5 fw-light">{{topic.title}}</a>
+  <div class="text-secondary fw-medium" style="font-size:11px;">
+    <span class="pe-3">{{topic.last_message_dt|format_datetime}}</span>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}

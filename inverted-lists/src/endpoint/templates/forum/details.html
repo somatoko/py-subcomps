@@ -1,0 +1,16 @@
+{% extends "base_layout.html" %}
+{% block title %}Details{% endblock %}
+
+{% block content %}
+
+<h3>Details</h3>
+<ul class="mb-5 w-50 list-group">
+  <li class="list-group-item">id: {{entry.id}}</li>
+  <li class="list-group-item">title: {{entry.title}}</li>
+  <li class="list-group-item">size: {{entry.size}}</li>
+  <li class="list-group-item">{{entry.views}} / {{entry.answers}} - {{entry.last_message_dt | format_datetime}}</li>
+  <li class="list-group-item">{{entry.seeders}}/{{entry.leechers}}</li>
+  <li class="list-group-item">{{entry.description}}</li>
+</ul>
+
+{% endblock %}

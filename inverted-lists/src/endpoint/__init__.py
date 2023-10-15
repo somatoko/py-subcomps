@@ -5,6 +5,7 @@ import datetime
 
 from src.endpoint.extensions import db
 from src.endpoint.blueprints.home import home
+from src.endpoint.blueprints.forum import forum
 
 # To launch from shell: FLASK_APP=src.endpoint FLASK_DEBUG=on flask run
 
@@ -45,4 +46,5 @@ def create_app(environment_name='dev'):
         '''
 
     app.register_blueprint(home, url_prefix='/')
+    app.register_blueprint(forum, url_prefix='/forum')
     return app

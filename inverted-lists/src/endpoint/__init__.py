@@ -45,6 +45,12 @@ def create_app(environment_name='dev'):
         # return time.ctime(value)
         '''
 
+    @app.template_filter()
+    def forum_title(value):
+        if '|' in value:
+            parts = value.split('|')
+            return f'{parts[0]}\n{parts[1]}'
+
     app.register_blueprint(home, url_prefix='/')
     app.register_blueprint(forum, url_prefix='/forum')
     return app

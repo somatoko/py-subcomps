@@ -28,6 +28,10 @@
               href="/favourites">Favourites</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link {% if request.url_rule.endpoint == 'home.favourites'%}active{% endif %}"
+              href="/forum">Forum</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link {% if request.url_rule.endpoint == 'home.about'%}active{% endif %}"
               href="/about">About</a>
           </li>

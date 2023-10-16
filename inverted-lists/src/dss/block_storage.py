@@ -30,12 +30,15 @@ class BlockStorage:
 
     # ----------------- Public API
 
-    def find_block(self, block_id):
+    def find_block(self, block_id, preload=False):
         if block_id >= self.block_count:
             # raise ValueError('Block ID exceeds present blocks')
             return None
         block = Block(block_id, self.file,
                       self.header_size, self.block_size)
+        if preload:
+            block.load()
+
         return block
 
     def create_block(self):

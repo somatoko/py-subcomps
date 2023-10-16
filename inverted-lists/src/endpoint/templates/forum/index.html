@@ -9,7 +9,7 @@
 {% for topic in topics %}
 <div class="my-3">
   <a href="{{ url_for('forum.details', id=topic.id ) }}"
-    class="link-offset-2 link-underline link-underline-opacity-0 link-underline-opacity-75-hover text-nowrap text-primary fs-5 fw-light">{{topic.title}}</a>
+    class="link-offset-2 link-underline link-underline-opacity-0 link-underline-opacity-75-hover text-nowrap text-primary fs-6 fw-light">{{topic.title | forum_title}}</a>
   <div class="text-secondary fw-medium" style="font-size:11px;">
     <span class="pe-3">{{topic.last_message_dt|format_datetime}}</span>
   </div>

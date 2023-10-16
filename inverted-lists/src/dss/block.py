@@ -16,6 +16,8 @@ class Block:
         self.is_deleted = False
         self.is_leaf = False
 
+        self.data = b''
+
     def get_header(self):
         self._set_cursor(src_offset)
         return self._fd.read(self.header_size)
@@ -40,6 +42,26 @@ class Block:
         fmt = '>IHH??'
         bytes = struct.pack(fmt, self.record_length, self.next_id, self.prev_id, self.is_deleted, self.is_leaf)
         self._fd.write(bytes)
+
+    def flush(self):
+        header_fmt = '>IHH??'
+        header_bytes = struct.pack(header_fmt, self.record_length, self.next_id, self.prev_id, self.is_deleted, self.is_leaf)
+        block_bytes = header_bytes + self.data
+        self._set_cursor()
+        self._fd.write(block_bytes)
+
+    def load(self):
+        self._set_cursor()
+        data = self._fd.read(self.block_size)
+
+        a, b, c, d, e = struct.unpack('>IHH??', data[:self.header_size])
+        self.record_length = a
+        self.next_id = b
+        self.prev_id = c
+        self.is_deleted = d
+        self.is_leaf = e
+
+        self.data = data[self.header_size:]
 
     def set_header(self, value):
         self._set_cursor(src_offset)

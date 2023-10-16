@@ -1,3 +1,4 @@
+import math
 from .block_storage import BlockStorage
 
 
@@ -68,6 +69,84 @@ class RecordStorage:
             bytes_read += read_count
         
         return result_bytes
+
+    def update(self, block_id, entity):
+        data = entity.serialize()
+        total_length = len(data)
+
+        first_block = self._block_storage.find_block(block_id, True)
+        if first_block is None:
+            raise ValueError('Unable to load block with a given block id.')
+
+        block_capacity = first_block.content_length
+        blocks_needed = math.ceil(total_length / block_capacity)
+
+        reuse_blocks = []
+        if first_block.next_id:
+            reuse_blocks.append(first_block.next_id)
+
+        # write first block setting
+        first_block.record_length = total_length
+        first_block.next_id = 0
+        first_block.prev_id = 0
+        first_block.data = data[:block_capacity]
+
+        if blocks_needed == 1:
+            first_block.flush()
+            return first_block.id
+        
+        def get_free_block():
+            if reuse_blocks:
+                b = self._block_storage.find_block(reuse_blocks.pop(), True)
+                if b.next_id:
+                    reuse_blocks.append(b.next_id)
+                return b
+            else:
+                return self._allocate_fresh_block()
+        
+        offset = block_capacity
+        prev_block = first_block
+        for i in range(1, blocks_needed):
+            curr_block = get_free_block()
+
+            curr_block.prev_id = prev_block.id
+            curr_bytes_size = min(block_capacity, total_length - offset)
+            curr_block.data = data[offset : offset + curr_bytes_size]
+            offset += curr_bytes_size
+
+            prev_block.next_id = curr_block.id
+            prev_block.flush()
+
+            prev_block = curr_block
+        
+        prev_block.next_id = 0
+        prev_block.flush()
+
+        freed_blocks = []
+        while reuse_blocks:
+            next_id = reuse_blocks.pop()
+            freed_blocks.append(next_id)
+            b = load_block(reuse_blocks.pop())
+            b.load_header()
+            if b.next_id:
+                reuse_blocks.append(b.next_id)
+
+            b.record_length = 0
+            b.next_id = 0
+            b.prev_id = 0
+            b.is_deleted = True
+            b.is_leaf = False
+            b.data = [0] * block_capacity
+            b.flush()
+        
+        # TODO: register freed_block with the zero-block
+        # print(f' = {len(freed_blocks)} block(s) became free')
+        # print(f' = record updated; bytes written: {offset}/{total_length}')
+        return first_block.id
+
+
+    def delete(self, block_id):
+        raise NotImplementedError
 
     # ----------------- Internal methods
 
